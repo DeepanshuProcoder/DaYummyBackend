@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const orderRoutes = require("./routes/orderRoutes");
 const connectDB = require("./config/db");
+require("dotenv").config();
 const profileRoutes = require("./routes/profileRoutes");
 const couponRoutes = require("./routes/couponRoutes")
 const settingsRoutes = require("./routes/settingsRoutes");
