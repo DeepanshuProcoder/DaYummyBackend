@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv");
+
 const orderRoutes = require("./routes/orderRoutes");
 const connectDB = require("./config/db");
 require("dotenv").config();
@@ -9,8 +9,8 @@ const couponRoutes = require("./routes/couponRoutes")
 const settingsRoutes = require("./routes/settingsRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 
-console.log("Settings Routes:", settingsRoutes)
-dotenv.config();
+
+
 
 const app = express();
 
@@ -45,7 +45,7 @@ app.use(
 
     "/api/coupons",couponRoutes);
 app.use("/api/products",productRoutes);
-app.use("/api/settings", settingsRoutes);
+
 app.use(
 
 "/uploads",
