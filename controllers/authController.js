@@ -64,13 +64,15 @@ exports.register = async (req, res) => {
         });
 
     } catch (err) {
+    console.error("REGISTER ERROR");
+    console.error(err);
+    console.error(err.stack);
 
-        console.log(err);
-
-        return res.status(500).json({
-            success: false,
-            message: err.message
-        });
+    return res.status(500).json({
+        success: false,
+        message: err.message
+    });
+}
 
     }
 };
