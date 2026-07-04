@@ -21,7 +21,7 @@ transporter.verify((error) => {
 const sendOTP = async (email, name, otp) => {
 
     const mailOptions = {
-        from: `"Da Yummy" <${process.env.BREVO_USER}>`,
+        from: `"Da Yummy" <dayummy25@gmail.com>`,
         to: email,
         subject: "Food Website Email Verification",
         html: `
