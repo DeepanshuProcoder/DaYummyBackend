@@ -55,7 +55,7 @@ exports.register = async (req, res) => {
             otpExpiry: Date.now() + 5 * 60 * 1000,
             attempts: 0
         };
-
+console.log("Sending OTP to:", email);
         await sendOTP(email, fullName, otp);
 
         return res.status(200).json({
