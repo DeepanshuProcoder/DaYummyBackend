@@ -18,7 +18,7 @@ transporter.verify((error) => {
         console.log("✅ Brevo SMTP Ready");
     }
 });
-console.log("Sending OTP to:", email);
+
 const sendOTP = async (email, name, otp) => {
 
     const mailOptions = {
