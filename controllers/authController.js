@@ -75,7 +75,6 @@ exports.register = async (req, res) => {
 }
 
     }
-};
 
 // ================= VERIFY OTP =================
 
