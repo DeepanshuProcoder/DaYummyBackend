@@ -1,28 +1,34 @@
-const nodemailer = require("nodemailer");
+const { BrevoClient } = require("@getbrevo/brevo");
 
-console.log("BREVO_USER:", process.env.BREVO_USER);
-console.log("BREVO_PASS exists:", !!process.env.BREVO_PASS);
-
-const transporter = nodemailer.createTransport({
-    host: "smtp-relay.brevo.com",
-    port: 587,
-    secure: false,
-    requireTLS: true,
-    connectionTimeout: 30000,
-    greetingTimeout: 30000,
-    socketTimeout: 30000,
-    auth: {
-        user: process.env.BREVO_USER,
-        pass: process.env.BREVO_PASS,
-    },
+const brevo = new BrevoClient({
+  apiKey: process.env.BREVO_API_KEY,
 });
 
-(async () => {
-    try {
-        await transporter.verify();
-        console.log("✅ Brevo SMTP Ready");
-    } catch (err) {
-        console.error("❌ Brevo Verify Error:");
-        console.error(err);
-    }
-})();
+const sendOTP = async (email, name, otp) => {
+  await brevo.transactionalEmails.sendTransacEmail({
+    sender: {
+      name: "Da Yummy",
+      email: "dayummy25@gmail.com", // Your VERIFIED sender
+    },
+    to: [
+      {
+        email,
+        name,
+      },
+    ],
+    subject: "Food Website Email Verification",
+    htmlContent: `
+      <div style="font-family:Arial;padding:30px">
+        <h2>Hello ${name} 👋</h2>
+        <h3>Welcome to Da Yummy</h3>
+        <p>Your OTP is</p>
+        <h1 style="letter-spacing:8px;color:#ff6600">${otp}</h1>
+        <p>This OTP will expire in 5 minutes.</p>
+      </div>
+    `,
+  });
+
+  console.log("✅ OTP Email Sent Successfully");
+};
+
+module.exports = sendOTP;
