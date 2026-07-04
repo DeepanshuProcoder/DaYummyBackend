@@ -1,42 +1,50 @@
-const { BrevoClient } = require("@getbrevo/brevo");
+const brevo = require("@getbrevo/brevo");
 
-const brevo = new BrevoClient({
-    apiKey: process.env.BREVO_API_KEY,
-});
+const apiInstance = new brevo.TransactionalEmailsApi();
+
+apiInstance.setApiKey(
+    brevo.TransactionalEmailsApiApiKeys.apiKey,
+    process.env.BREVO_API_KEY
+);
 
 const sendOTP = async (email, name, otp) => {
     try {
-        const result = await brevo.transactionalEmails.sendTransacEmail({
-            sender: {
-                name: "Da Yummy",
-                email: "dayummy25@gmail.com", // Verified sender
-            },
+        const sendSmtpEmail = new brevo.SendSmtpEmail();
 
-            to: [
-                {
-                    email,
-                    name,
-                },
-            ],
+        sendSmtpEmail.sender = {
+            name: "Da Yummy",
+            email: "dayummy25@gmail.com" // Your verified sender
+        };
 
-            subject: "Food Website Email Verification",
+        sendSmtpEmail.to = [
+            {
+                email: email,
+                name: name
+            }
+        ];
 
-            htmlContent: `
-            <div style="font-family:Arial;padding:30px">
-                <h2>Hello ${name} 👋</h2>
-                <h3>Welcome to Da Yummy</h3>
-                <p>Your OTP is</p>
-                <h1 style="letter-spacing:8px;color:#ff6600">${otp}</h1>
-                <p>This OTP expires in 5 minutes.</p>
-            </div>
-            `,
-        });
+        sendSmtpEmail.subject = "Food Website Email Verification";
 
-        console.log("✅ Email sent");
+        sendSmtpEmail.htmlContent = `
+        <div style="font-family:Arial;padding:30px">
+            <h2>Hello ${name} 👋</h2>
+            <h3>Welcome to Da Yummy</h3>
+            <p>Your OTP is</p>
+            <h1 style="letter-spacing:8px;color:#ff6600">${otp}</h1>
+            <p>This OTP expires in 5 minutes.</p>
+            <hr>
+            <small>If you didn't request this OTP, simply ignore this email.</small>
+        </div>
+        `;
+
+        const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
+
+        console.log("✅ OTP Email Sent Successfully");
         console.log(result);
+
     } catch (err) {
-        console.error("BREVO API ERROR");
-        console.error(err);
+        console.error("❌ BREVO API ERROR");
+        console.error(err.response?.body || err);
         throw err;
     }
 };
