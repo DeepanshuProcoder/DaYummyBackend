@@ -1,52 +1,66 @@
-const brevo = require("@getbrevo/brevo");
-
-const apiInstance = new brevo.TransactionalEmailsApi();
-
-apiInstance.setApiKey(
-    brevo.TransactionalEmailsApiApiKeys.apiKey,
-    process.env.BREVO_API_KEY
-);
+const axios = require("axios");
 
 const sendOTP = async (email, name, otp) => {
+
     try {
-        const sendSmtpEmail = new brevo.SendSmtpEmail();
 
-        sendSmtpEmail.sender = {
-            name: "Da Yummy",
-            email: "dayummy25@gmail.com" // Your verified sender
-        };
-
-        sendSmtpEmail.to = [
+        await axios.post(
+            "https://api.brevo.com/v3/smtp/email",
             {
-                email: email,
-                name: name
+                sender: {
+                    name: "Da Yummy",
+                    email: "dayummy25@gmail.com"
+                },
+
+                to: [
+                    {
+                        email,
+                        name
+                    }
+                ],
+
+                subject: "Food Website Email Verification",
+
+                htmlContent: `
+                <div style="font-family:Arial;padding:30px">
+                    <h2>Hello ${name} 👋</h2>
+                    <h3>Welcome to Da Yummy</h3>
+                    <p>Your OTP is</p>
+
+                    <h1 style="color:#ff6600;letter-spacing:8px">
+                        ${otp}
+                    </h1>
+
+                    <p>This OTP expires in 5 minutes.</p>
+
+                    <hr>
+
+                    <small>If you didn't request this OTP, ignore this email.</small>
+
+                </div>
+                `
+            },
+            {
+                headers: {
+                    accept: "application/json",
+                    "api-key": process.env.BREVO_API_KEY,
+                    "content-type": "application/json"
+                }
             }
-        ];
+        );
 
-        sendSmtpEmail.subject = "Food Website Email Verification";
-
-        sendSmtpEmail.htmlContent = `
-        <div style="font-family:Arial;padding:30px">
-            <h2>Hello ${name} 👋</h2>
-            <h3>Welcome to Da Yummy</h3>
-            <p>Your OTP is</p>
-            <h1 style="letter-spacing:8px;color:#ff6600">${otp}</h1>
-            <p>This OTP expires in 5 minutes.</p>
-            <hr>
-            <small>If you didn't request this OTP, simply ignore this email.</small>
-        </div>
-        `;
-
-        const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
-
-        console.log("✅ OTP Email Sent Successfully");
-        console.log(result);
+        console.log("✅ OTP Email Sent");
 
     } catch (err) {
-        console.error("❌ BREVO API ERROR");
-        console.error(err.response?.body || err);
+
+        console.error("BREVO OTP ERROR");
+
+        console.error(err.response?.data || err.message);
+
         throw err;
+
     }
+
 };
 
 module.exports = sendOTP;
