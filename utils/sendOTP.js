@@ -1,56 +1,68 @@
-const { Resend } = require("resend");
+const Mailjet = require("node-mailjet");
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const mailjet = Mailjet.apiConnect(
+    process.env.MAILJET_API_KEY,
+    process.env.MAILJET_SECRET_KEY
+);
 
 const sendOTP = async (email, name, otp) => {
     try {
 
-        const { data, error } = await resend.emails.send({
+        const request = await mailjet
+            .post("send", { version: "v3.1" })
+            .request({
+                Messages: [
+                    {
+                        From: {
+                            Email: "deepanshuchaudhary0698@gmail.com",
+                            Name: "Da Yummy"
+                        },
 
-            from: "Da Yummy <onboarding@resend.dev>",
+                        To: [
+                            {
+                                Email: email,
+                                Name: name
+                            }
+                        ],
 
-            to: [email],
+                        Subject: "Da Yummy Email Verification",
 
-            subject: "Da Yummy Email Verification",
+                        HTMLPart: `
+                        <div style="font-family:Arial;padding:30px">
+                            <h2>Hello ${name} 👋</h2>
 
-            html: `
-                <div style="font-family:Arial;padding:25px">
+                            <h3>Welcome to Da Yummy</h3>
 
-                    <h2>Hello ${name} 👋</h2>
+                            <p>Your OTP is</p>
 
-                    <h3>Welcome to Da Yummy 🍕</h3>
+                            <h1 style="letter-spacing:8px;color:#ff6600">
+                                ${otp}
+                            </h1>
 
-                    <p>Your verification OTP is</p>
+                            <p>This OTP expires in 5 minutes.</p>
 
-                    <h1 style="letter-spacing:8px;color:#ff6600">
-                        ${otp}
-                    </h1>
+                            <hr>
 
-                    <p>This OTP will expire in 5 minutes.</p>
+                            <small>
+                                If you didn't request this OTP, ignore this email.
+                            </small>
+                        </div>
+                        `
+                    }
+                ]
+            });
 
-                    <hr>
-
-                    <small>
-                        If you didn't request this OTP, simply ignore this email.
-                    </small>
-
-                </div>
-            `
-        });
-
-        if (error) {
-            console.error(error);
-            throw new Error(error.message);
-        }
-
-        console.log("✅ OTP Email Sent");
-        console.log(data);
+        console.log("✅ OTP Sent Successfully");
+        console.log(request.body);
 
     } catch (err) {
 
-        console.error("RESEND ERROR");
+        console.error("❌ MAILJET ERROR");
 
-        console.error(err);
+        console.error(
+            err.statusCode,
+            err.response?.body || err
+        );
 
         throw err;
 
