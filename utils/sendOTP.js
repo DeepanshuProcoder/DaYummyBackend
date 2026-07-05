@@ -1,66 +1,60 @@
-const axios = require("axios");
+const { Resend } = require("resend");
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendOTP = async (email, name, otp) => {
-
     try {
 
-        await axios.post(
-            "https://api.brevo.com/v3/smtp/email",
-            {
-                sender: {
-                    name: "Da Yummy",
-                    email: "dayummy25@gmail.com"
-                },
+        const { data, error } = await resend.emails.send({
 
-                to: [
-                    {
-                        email,
-                        name
-                    }
-                ],
+            from: "Da Yummy <onboarding@resend.dev>",
 
-                subject: "Food Website Email Verification",
+            to: [email],
 
-                htmlContent: `
-                <div style="font-family:Arial;padding:30px">
+            subject: "Da Yummy Email Verification",
+
+            html: `
+                <div style="font-family:Arial;padding:25px">
+
                     <h2>Hello ${name} 👋</h2>
-                    <h3>Welcome to Da Yummy</h3>
-                    <p>Your OTP is</p>
 
-                    <h1 style="color:#ff6600;letter-spacing:8px">
+                    <h3>Welcome to Da Yummy 🍕</h3>
+
+                    <p>Your verification OTP is</p>
+
+                    <h1 style="letter-spacing:8px;color:#ff6600">
                         ${otp}
                     </h1>
 
-                    <p>This OTP expires in 5 minutes.</p>
+                    <p>This OTP will expire in 5 minutes.</p>
 
                     <hr>
 
-                    <small>If you didn't request this OTP, ignore this email.</small>
+                    <small>
+                        If you didn't request this OTP, simply ignore this email.
+                    </small>
 
                 </div>
-                `
-            },
-            {
-                headers: {
-                    accept: "application/json",
-                    "api-key": process.env.BREVO_API_KEY,
-                    "content-type": "application/json"
-                }
-            }
-        );
+            `
+        });
+
+        if (error) {
+            console.error(error);
+            throw new Error(error.message);
+        }
 
         console.log("✅ OTP Email Sent");
+        console.log(data);
 
     } catch (err) {
 
-        console.error("BREVO OTP ERROR");
+        console.error("RESEND ERROR");
 
-        console.error(err.response?.data || err.message);
+        console.error(err);
 
         throw err;
 
     }
-
 };
 
 module.exports = sendOTP;
